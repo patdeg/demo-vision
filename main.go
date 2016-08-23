@@ -28,7 +28,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	log.Debugf(c, "Home Handler")
 
-	if NotLoggedIn(w, r) {
+	if RedirectIfNotLoggedIn(w, r) {
 		return
 	}
 
@@ -46,7 +46,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	log.Debugf(c, "Upload File Handler")
 
-	if NotLoggedIn(w, r) {
+	if RedirectIfNotLoggedIn(w, r) {
 		return
 	}
 

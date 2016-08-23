@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func NotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
+func RedirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	c := appengine.NewContext(r)
 	if user.Current(c) == nil {
 		redirectURL, err := user.LoginURL(c, r.URL.Path)
