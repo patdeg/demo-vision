@@ -5,6 +5,15 @@ runtime: go
 api_version: go1
 
 handlers:
+
+- url: /app.js
+  static_files: app.js
+  upload: app.js
+
+- url: /app.css
+  static_files: app.css
+  upload: app.css
+
 - url: /.*
   script: _go_app
   secure: always  

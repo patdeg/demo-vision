@@ -1,4 +1,3 @@
-// my doc
 package main
 
 import (
@@ -11,6 +10,11 @@ import (
 	"net/http"
 )
 
+// Function for Handlers to check if user is logged in
+// and redirect to login URL if required. Return TRUE when a redirect
+// is needed (or a fatal error occurs when getting the Login URL).
+// When returning TRUE, the Handler should just exit as the user will
+// be redirected to the Login URL.
 func RedirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	c := appengine.NewContext(r)
 	if user.Current(c) == nil {
@@ -26,7 +30,7 @@ func RedirectIfNotLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-// Small utility function to convert a byte to a string
+// Function to convert an array of bytes to a string
 func BytesToString(b []byte) (s string) {
 	n := bytes.Index(b, []byte{0})
 	if n > 0 {
@@ -37,6 +41,8 @@ func BytesToString(b []byte) (s string) {
 	return
 }
 
+// Function to write the JSON of an object to the http.ResponseWriter
+// of a Handler
 func WriteJSON(w http.ResponseWriter, d interface{}) error {
 	jsonData, err := json.Marshal(d)
 	if err != nil {

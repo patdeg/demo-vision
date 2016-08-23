@@ -1,4 +1,4 @@
-// my doc
+// Demo of Google Vision API on App Engine
 package main
 
 import (
@@ -14,26 +14,32 @@ import (
 	"net/http"
 )
 
+// HTML Template for the home page
+var homeTemplate = template.Must(template.New("index.html").Delims("[[", "]]").ParseFiles("index.html"))
+
+// Main init function to assign paths to handlers
 func init() {
 
+	// Home page (& catch-all)
 	http.HandleFunc("/", HomeHandler)
+
+	// API to upload file to
 	http.HandleFunc("/upload", UploadFileHandler)
 
 }
 
-var homeTemplate = template.Must(template.New("index.html").Delims("[[", "]]").ParseFiles("index.html"))
-
+// Home page handler
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-
 	c := appengine.NewContext(r)
-	log.Debugf(c, "Home Handler")
+	log.Debugf(c, ">>> Home Handler")
 
+	// Check if user is logged in, otherwise exit (as redirect was requested)
 	if RedirectIfNotLoggedIn(w, r) {
 		return
 	}
 
+	// Execute the home page template
 	if err := homeTemplate.Execute(w, template.FuncMap{
-		"Path":    r.URL.Path,
 		"Version": appengine.VersionID(c),
 	}); err != nil {
 		log.Errorf(c, "Error with homeTemplate: %v", err)
@@ -42,43 +48,40 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// API to upload file to
 func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-	log.Debugf(c, "Upload File Handler")
+	log.Debugf(c, ">>> Upload File Handler")
 
+	// Check if user is logged in, otherwise exit (as redirect was requested)
 	if RedirectIfNotLoggedIn(w, r) {
 		return
 	}
 
-	log.Debugf(c, "Form:%v ", r.Form)
-	log.Debugf(c, "PostForm:%v ", r.PostForm)
-	log.Debugf(c, "MultipartForm:%v ", r.MultipartForm)
-
+	// Parse multipart form in a 32 Mb buffer
 	r.ParseMultipartForm(32 << 20)
 
-	log.Debugf(c, "(2) Form:%v ", r.Form)
-	log.Debugf(c, "(2) PostForm:%v ", r.PostForm)
-	log.Debugf(c, "(2) MultipartForm:%v ", r.MultipartForm)
-
-	file, handler, err := r.FormFile("select_files")
+	// Extract file (code assumes single file, i.e. no "multiple" in the HTML form)
+	file, _, err := r.FormFile("select_files")
 	if err != nil {
 		log.Errorf(c, "Error getting : %v", err)
 		http.Error(w, "Internal Server Error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
-	log.Debugf(c, "Handler : %v", handler)
-	log.Debugf(c, "Header : %v", handler.Header)
 
+	// Read data from file
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Errorf(c, "Error reading file : %v", err)
 		http.Error(w, "Internal Server Error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Debugf(c, "Data : %v", BytesToString(data))
 
+	// Encode data in []byte to Base 64 in string
 	bodyString := base64.StdEncoding.EncodeToString(data)
+
+	// Create Service Account Client with relevant scopes
 	serviceAccountClient := &http.Client{
 		Transport: &oauth2.Transport{
 			Source: google.AppEngineTokenSource(c,
@@ -90,6 +93,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	// Create Vision API Service using Service Account Client
 	srv, err := vision.New(serviceAccountClient)
 	if err != nil {
 		log.Errorf(c, "Error, getting service account: %v", err)
@@ -97,6 +101,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create a Vision API request
 	req := &vision.AnnotateImageRequest{
 		// Apply image which is encoded by base64.
 		Image: &vision.Image{
@@ -115,7 +120,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	// To call multiple image annotation requests.
+	// Create single request batch
 	batch := &vision.BatchAnnotateImagesRequest{
 		Requests: []*vision.AnnotateImageRequest{req},
 	}
@@ -128,5 +133,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Return JSON to API/user
 	WriteJSON(w, &res)
+
 }

@@ -1,6 +1,8 @@
 
 var myApp = angular.module('myApp', []);
 
+
+// Upload Service (factory) to load file (image) to backend
 myApp.factory('UploadService', ['$http',
     function ($http) {
     return {
@@ -8,9 +10,13 @@ myApp.factory('UploadService', ['$http',
     		if (!files) {
     			console.log("Warning: no files to upload");
     			return;
-    		}
-    		console.log("Uploading files:",files);
+    		}    	
+    		// Upload destination	
 			var url = '/upload';
+
+			// Loop through files and upload one by one 
+			// Overcomplification in the simple example 
+			// with unique file, but usefull down the road
 			for ( var i = 0; i < files.length; i++) {
 				var fd = new FormData();
 				fd.append("select_files", files[i]);
@@ -20,14 +26,11 @@ myApp.factory('UploadService', ['$http',
 						'Content-Type' : undefined
 					},
 					transformRequest : angular.identity
-
 				})
-				.success(function(data) {
-					console.log(data);
+				.success(function(data) {					
 					success(data);
 				})
-				.error(function(data) {
-					console.log(data);
+				.error(function(data) {					
 					error(data);
 				});
 			}
@@ -38,32 +41,39 @@ myApp.factory('UploadService', ['$http',
 myApp.controller('MyController', ['$scope', '$location', '$window', '$http', '$timeout', 'UploadService',
     function($scope, $location, $window, $http, $timeout, UploadService) {
 
+    	// Boolean to change button label from "Select New Picture" to "Select Picture"
     	$scope.isFirstTime = true;
 
+    	// Boolean to change text in the page when uploading
+		$scope.isUploading = false;
+
+    	// List of files to upload
     	$scope.files = [];
 
-    	$scope.uploadedFile = function(element) {
-    		console.log('>>> uploadedFile');
+    	// Function called when the list of file(s) in the form change
+    	$scope.uploadedFile = function(element) {    		
 			$scope.$apply(function($scope) {
 				$scope.files = element.files;         
 			});
+			// When adding/changing a file, automatically upload the file to the server
 			if ($scope.files.length>0) {
 				$scope.addFile();
 			}
 			
 		};
 
-		$scope.isUploading = false;
+		// Function to load file to the server
 		$scope.addFile = function() {
-			console.log('>>> addFile');
+
+			// Set Upload mode
 			$scope.isUploading = true;
 			$scope.isFirstTime = false;
 			$scope.labelAnnotations = [];
 			$scope.landmarkAnnotations = [];
+
 			UploadService.uploadfile(
 				$scope.files,
-				function( msg ) { // success		
-					console.log('uploaded',msg);
+				function( msg ) { // success							
 					if (msg && msg.responses && (msg.responses.length>0) && msg.responses[0].labelAnnotations) {
 						$scope.labelAnnotations = msg.responses[0].labelAnnotations;
 					} else {
@@ -84,13 +94,12 @@ myApp.controller('MyController', ['$scope', '$location', '$window', '$http', '$t
 					$scope.isUploading = false;
 				},
 				function( msg ) { // error			
-					console.log('error',msg);
+					console.log('Error:',msg);
 					$scope.labelAnnotations = [];
 					$scope.landmarkAnnotations = [];
 					$scope.isUploading = false;
 				}
 			);
 		};
-
     }
 ]);

@@ -1,33 +1,10 @@
 <html ng-app="myApp">
 
 <head>  
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<style>
-	.btn-file {
-	    position: relative;
-	    overflow: hidden;
-	}
-	.btn-file input[type=file] {
-	    position: absolute;
-	    top: 0;
-	    right: 0;
-	    min-width: 100%;
-	    min-height: 100%;
-	    font-size: 100px;
-	    text-align: right;
-	    filter: alpha(opacity=0);
-	    opacity: 0;
-	    outline: none;
-	    background: white;
-	    cursor: inherit;
-	    display: block;
-	}
-	.center {	    
-	    text-align: center;
-	}
-</style>
-<title>Google Vision API Demo</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">	
+	<link href="/app.css?version=[[.Version]]" rel="stylesheet">
+	<title>Google Vision API Demo</title>
 </head>
 
 <body ng-controller="MyController" class="center">
@@ -83,105 +60,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-<script type="text/javascript">
-
-var myApp = angular.module('myApp', []);
-
-// http://www.angulartutorial.net/2015/03/file-upload-and-sending-data-to-backend.html
-myApp.factory('UploadService', ['$http',
-    function ($http) {
-    return {
-    	uploadfile : function(files,success,error){
-    		if (!files) {
-    			console.log("Warning: no files to upload");
-    			return;
-    		}
-    		console.log("Uploading files:",files);
-			var url = '/upload';
-			for ( var i = 0; i < files.length; i++) {
-				var fd = new FormData();
-				fd.append("select_files", files[i]);
-				$http.post(url, fd, {
-					withCredentials : false,
-					headers : {
-						'Content-Type' : undefined
-					},
-					transformRequest : angular.identity
-
-				})
-				.success(function(data) {
-					console.log(data);
-					success(data);
-				})
-				.error(function(data) {
-					console.log(data);
-					error(data);
-				});
-			}
-		}       
-    }
-}]);
-
-myApp.controller('MyController', ['$scope', '$location', '$window', '$http', '$timeout', 'UploadService',
-    function($scope, $location, $window, $http, $timeout, UploadService) {
-
-    	$scope.isFirstTime = true;
-
-    	$scope.files = [];
-
-    	$scope.uploadedFile = function(element) {
-    		console.log('>>> uploadedFile');
-			$scope.$apply(function($scope) {
-				$scope.files = element.files;         
-			});
-			if ($scope.files.length>0) {
-				$scope.addFile();
-			}
-			
-		};
-
-		$scope.isUploading = false;
-		$scope.addFile = function() {
-			console.log('>>> addFile');
-			$scope.isUploading = true;
-			$scope.isFirstTime = false;
-			$scope.labelAnnotations = [];
-			$scope.landmarkAnnotations = [];
-			UploadService.uploadfile(
-				$scope.files,
-				function( msg ) { // success		
-					console.log('uploaded',msg);
-					if (msg && msg.responses && (msg.responses.length>0) && msg.responses[0].labelAnnotations) {
-						$scope.labelAnnotations = msg.responses[0].labelAnnotations;
-					} else {
-						$scope.labelAnnotations = [];
-					}
-					for (var i = 0; i<$scope.labelAnnotations.length;i++) {
-						$scope.labelAnnotations[i].score_p = Math.round(100*$scope.labelAnnotations[i].score);
-					}
-
-					if (msg && msg.responses && (msg.responses.length>0) && msg.responses[0].landmarkAnnotations) {
-						$scope.landmarkAnnotations = msg.responses[0].landmarkAnnotations;
-					} else {
-						$scope.landmarkAnnotations = [];
-					}
-					for (var i = 0; i<$scope.landmarkAnnotations.length;i++) {
-						$scope.landmarkAnnotations[i].score_p = Math.round(100*$scope.landmarkAnnotations[i].score);
-					}
-					$scope.isUploading = false;
-				},
-				function( msg ) { // error			
-					console.log('error',msg);
-					$scope.labelAnnotations = [];
-					$scope.landmarkAnnotations = [];
-					$scope.isUploading = false;
-				}
-			);
-		};
-
-    }
-]);
-
-</script>
+<script type="text/javascript" src="/app.js?version=[[.Version]]"></script>
 </body>
 </html>
