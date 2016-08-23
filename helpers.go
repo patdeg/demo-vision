@@ -74,6 +74,15 @@ func WriteJSON(w http.ResponseWriter, d interface{}) error {
 	return nil
 }
 
+// Function to convert an object into a JSON string
+func ToJSON(d interface{}) string {
+	jsonData, err := json.Marshal(d)
+	if err != nil {
+		return ""
+	}
+	return BytesToString(jsonData)
+}
+
 // Get BigQuery Service Account Client
 func GetBQServiceAccountClient(c context.Context) (*bigquery.Service, error) {
 	serviceAccountClient := &http.Client{

@@ -158,7 +158,8 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	// Execute the "vision.images.annotate".
 	res, err := srv.Images.Annotate(batch).Do()
 	if err != nil {
-		log.Errorf(c, "Error, executing annotae: %v", err)
+		log.Errorf(c, "Error, executing annotate: %v", err)
+		log.Debugf(c, "Request: %v", ToJSON(req))
 		http.Error(w, "Internal Server Error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -203,7 +204,6 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 			bqLabel := map[string]bigquery.JsonValue{
 				"Type":  "Text",
 				"Label": l.Description,
-				"Score": l.Score,
 			}
 			bqLabels = append(bqLabels, bqLabel)
 			// Use only one text annotations (full text), ignore individual words
@@ -243,6 +243,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	err = StreamDataInBigquery(c, projectId, "demo", "vision", bq_req)
 	if err != nil {
 		log.Errorf(c, "Error while streaming visit to BigQuery: %v", err)
+		log.Debugf(c, "Request: %v", ToJSON(bq_req))
 		http.Error(w, "Internal Server Error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -9,20 +9,21 @@
 
 <body ng-controller="MyController" class="center">
 
-<div class="container" ng-cloak>
-	<div class="row">
+<div class="container">
+
+	<div class="row" ng-cloak>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<h1>Google Vision API Demo</h1>										
 		</div>
 	</div> <!-- row -->
 
-	<div class="row" ng-show="isUploading">
+	<div class="row" ng-show="isUploading" ng-cloak>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<h2 >Please wait for the image to upload...</h2>
 		</div>
 	</div> <!-- row -->
 
-	<div class="row" ng-hide="isUploading">
+	<div class="row" ng-hide="isUploading" ng-cloak>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="textAnnotations.length>0">
 			<h2>Text</h2>						
 			<ul class="list-group">
@@ -33,7 +34,7 @@
 		</div>
 	</div> <!-- row -->
 
-	<div class="row" ng-hide="isUploading">
+	<div class="row" ng-hide="isUploading" ng-cloak>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<h2 ng-show="labelAnnotations.length>0">Labels</h2>
 			<ul class="list-group">
@@ -44,7 +45,7 @@
 		</div>
 	</div> <!-- row -->
 
-	<div class="row" ng-hide="isUploading">
+	<div class="row" ng-hide="isUploading" ng-cloak>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<h2 ng-show="landmarkAnnotations.length>0">Landmarks</h2>
 			<ul class="list-group">
@@ -55,7 +56,7 @@
 		</div>
 	</div> <!-- row -->
 
-	<div class="row" ng-hide="isUploading">
+	<div class="row" ng-hide="isUploading" ng-cloak>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<h2 ng-show="logoAnnotations.length>0">Logo</h2>
 			<ul class="list-group">
@@ -66,7 +67,7 @@
 		</div>
 	</div> <!-- row -->
 
-	<div class="row" ng-hide="isUploading">
+	<div class="row" ng-hide="isUploading" ng-cloak>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<form name="upload" class="form center" data-ng-submit="addFile()" ng-hide="isUploading">
 				<span class="btn btn-success btn-file btn-lg" for="select_files">
