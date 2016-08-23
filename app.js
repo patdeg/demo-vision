@@ -50,6 +50,12 @@ myApp.controller('MyController', ['$scope', '$location', '$window', '$http', '$t
     	// List of files to upload
     	$scope.files = [];
 
+    	// Annotation arrays
+    	$scope.labelAnnotations = [];
+		$scope.landmarkAnnotations = [];
+		$scope.logoAnnotations = [];
+		$scope.textAnnotations = "";
+
     	// Function called when the list of file(s) in the form change
     	$scope.uploadedFile = function(element) {    		
 			$scope.$apply(function($scope) {
@@ -70,10 +76,13 @@ myApp.controller('MyController', ['$scope', '$location', '$window', '$http', '$t
 			$scope.isFirstTime = false;
 			$scope.labelAnnotations = [];
 			$scope.landmarkAnnotations = [];
+			$scope.logoAnnotations = [];
+			$scope.textAnnotations = "";
 
 			UploadService.uploadfile(
 				$scope.files,
-				function( msg ) { // success							
+				function( msg ) { // success	
+					console.log("Success:",msg);						
 					if (msg && msg.responses && (msg.responses.length>0) && msg.responses[0].labelAnnotations) {
 						$scope.labelAnnotations = msg.responses[0].labelAnnotations;
 					} else {
@@ -91,12 +100,30 @@ myApp.controller('MyController', ['$scope', '$location', '$window', '$http', '$t
 					for (var i = 0; i<$scope.landmarkAnnotations.length;i++) {
 						$scope.landmarkAnnotations[i].score_p = Math.round(100*$scope.landmarkAnnotations[i].score);
 					}
+
+					if (msg && msg.responses && (msg.responses.length>0) && msg.responses[0].logoAnnotations) {
+						$scope.logoAnnotations = msg.responses[0].logoAnnotations;
+					} else {
+						$scope.logoAnnotations = [];
+					}
+					for (var i = 0; i<$scope.logoAnnotations.length;i++) {
+						$scope.logoAnnotations[i].score_p = Math.round(100*$scope.logoAnnotations[i].score);
+					}
+
+					if (msg && msg.responses && (msg.responses.length>0) && msg.responses[0].textAnnotations && (msg.responses[0].textAnnotations.length>0)) {
+						$scope.textAnnotations = msg.responses[0].textAnnotations[0].description;
+					} else {
+						$scope.textAnnotations = "";
+					}					
+
 					$scope.isUploading = false;
 				},
 				function( msg ) { // error			
 					console.log('Error:',msg);
 					$scope.labelAnnotations = [];
 					$scope.landmarkAnnotations = [];
+					$scope.logoAnnotations = [];
+					$scope.textAnnotations = "";
 					$scope.isUploading = false;
 				}
 			);

@@ -4,8 +4,7 @@ Demo of Google Vision API on App Engine
 
 How To Get Started
 ------------------
-In the file app.yaml, replace the application name with your App Engine project
-
+In the file app.yaml, replace the application name (here deglondemo) with your App Engine project
 
 License
 -------
