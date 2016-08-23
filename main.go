@@ -329,6 +329,12 @@ func RedirectBigQueryConsoleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if user.IsAdmin(c) == false {
+		log.Errorf(c, "Error, user %v is not an admin", user.Current(c).Email)
+		http.Error(w, "Unauthorized Access", http.StatusUnauthorized)
+		return
+	}
+
 	// Get projectId from appspot.com URL
 	projectId := strings.Replace(appengine.DefaultVersionHostname(c), ".appspot.com", "", 1)
 	log.Debugf(c, "Project: %v", projectId)
