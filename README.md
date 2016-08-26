@@ -6,6 +6,15 @@ How To Get Started
 ------------------
 In the file app.yaml, replace the application name (here deglondemo) with your App Engine project
 
+How it works
+------------
+
+Use this web application on your desktop or your phone to test the Google Vision API. 
+You can load in the server a local image or take a picture on your phone. Then the 
+application will run some of the annotations (Labels, Landmarks, Logos, Text) and 
+show the results on the user screen. The annotations and some of the meta-data will
+be streamed in real-time into BigQuery.
+
 License
 -------
 
